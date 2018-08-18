@@ -52,6 +52,8 @@ def response(sentence):
         path = PJ(this_dir,audio_dir)
         filelist = glob.glob(path)
         for f in sorted(filelist):
+            with open(f, 'rb') as fd:
+                simple_player.play_bytes(fd)
             print(f)
 
     elif '網友' in sentence and '推薦' in sentence:
@@ -61,6 +63,8 @@ def response(sentence):
         path = PJ(this_dir,audio_dir)
         filelist = glob.glob(path)
         for f in sorted(filelist):
+            with open(f, 'rb') as fd:
+                simple_player.play_bytes(fd)
             print(f)
 
     elif '更新' in sentence and '資料' in sentence:

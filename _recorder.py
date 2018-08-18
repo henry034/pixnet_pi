@@ -13,7 +13,7 @@ class _Recorder:
     cmd_for_arecord = 'arecord --format=S16_LE --duration={duration} --rate={rate} --file-type=raw -q'
     cmd_kill_pulseaudio = 'pulseaudio --kill'
 
-    def __init__(self, duration=4, rate=16000):
+    def __init__(self, duration=5, rate=16000):
         self.duration = duration
         self.rate = rate
         self.cmd_for_arecord = self.cmd_for_arecord.format(duration=duration, rate=rate)
