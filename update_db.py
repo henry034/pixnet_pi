@@ -4,8 +4,8 @@ import os
 import requests
 import shutil
 
-store_id = int(os.environ.get('STORE_ID'))
-if store_id is None:
+store_name = os.environ.get('STORE_NAME')
+if store_name is None:
     raise ValueError('Must provide websocket')
 
 def connect_db():
@@ -19,7 +19,12 @@ def connect_db():
 
 
 def clear_hot_file_local():
-    a=1
+    shutil.rmtree("./audio/hot_web/")
+    shutil.rmtree("./audio/hot_week/")
+    os.mkdir("./audio/hot_web/")
+    os.mkdir("./audio/hot_week/")
+
+
 def download_mp3(path, rank, week_tag = False):
     base = os.path.basename(path)
     path = path[2:]
@@ -34,11 +39,11 @@ def download_mp3(path, rank, week_tag = False):
 
 
 def get_hot_file_path_db(cur):
-    sql_cmd = ('SELECT * FROM store_list '
-               'WHERE storeID={}').format(store_id)
-    cur.execute(sql_cmd)
-    for id, name in cur:
-        store_name = name
+    #sql_cmd = ('SELECT * FROM store_list '
+    #           'WHERE storeID={}').format(store_id)
+    #cur.execute(sql_cmd)
+    #for id, name in cur:
+    #    store_name = name
     
     sql_cmd = ('SELECT path, rank FROM {} ORDER BY rank').format(store_name)
     cur.execute(sql_cmd)
@@ -48,7 +53,9 @@ def get_hot_file_path_db(cur):
         if rank > 0:
             download_mp3(path, rank, week_tag = False)
             print(path, rank)
+
 def main():
+    clear_hot_file_local()
     conn, cur = connect_db()
     get_hot_file_path_db(cur)
 

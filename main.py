@@ -12,7 +12,11 @@ from ._player import simple_player
 from ._recorder import simple_recorder
 from .logger import logger
 from .exceptions import WebSocketAuthenticationError
+import glob
 
+DEMO = True
+DEMO_CNT = 0
+#DEMO = False
 
 PJ = os.path.join
 this_dir = os.path.dirname(os.path.abspath(__file__))
@@ -37,10 +41,34 @@ def load_data():
         d = json.load(f)
     return d
 
-def response(sentenct, food_dict):
-    if '熱門' in sentence:
-        a = 1
+def response(sentence):
+    led.set_state(led.ON)
+    audio_dir = 'audio/'
 
+    if '本周' in sentence and '熱門' in sentence:
+        with open(PJ(this_dir, 'audio/week.mp3'), 'rb') as fd:
+            simple_player.play_bytes(fd)
+        audio_dir += 'hot_week/*'
+        path = PJ(this_dir,audio_dir)
+        filelist = glob.glob(path)
+        for f in sorted(filelist):
+            print(f)
+
+    elif '網友' in sentence and '推薦' in sentence:
+        with open(PJ(this_dir, 'audio/web.mp3'), 'rb') as fd:
+            simple_player.play_bytes(fd)
+        audio_dir += 'hot_web/*'
+        path = PJ(this_dir,audio_dir)
+        filelist = glob.glob(path)
+        for f in sorted(filelist):
+            print(f)
+
+    elif '更新' in sentence and '資料' in sentence:
+        update_data()
+        with open(PJ(this_dir, 'audio/update_finish.mp3'), 'rb') as fd:
+            simple_player.play_bytes(fd)
+
+    led.set_state(led.BLINK)
 async def record_to_buffer(ws_queue):
     led.set_state(led.PULSE_QUICK)
     logger.info('Recording from microphone.')
@@ -91,11 +119,24 @@ async def handle_websocket(ws_queue):
         out = await asyncio.ensure_future(wait_for_ws())
         with open(PJ(this_dir, 'res/response.mp3'), 'rb') as fd:
             simple_player.play_bytes(fd)
-        logger.info('STT result: %s' % out)
-        
+        logger.info('STT result: %s' % out) 
         led.set_state(led.BLINK_3)
-
+        
+        if DEMO:
+            if DEMO_CNT == 1:
+                out = '本周熱門'
+            elif DEMO_CNT == 2:
+                out = '網友推薦'
+            elif DEMO_CNT == 0:
+                out = '更新資料'
+        response(out) 
+        
 def main():
+    if DEMO:
+        global DEMO_CNT
+        DEMO_CNT += 1 
+        DEMO_CNT %= 3
+
     led.set_state(led.ON)
     with open(PJ(this_dir,'audio/welcome.mp3'), 'rb') as fd:
         simple_player.play_bytes(fd)
