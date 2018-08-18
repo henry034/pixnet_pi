@@ -1,0 +1,12 @@
+{
+  "hot_web": [
+    {
+      "滷肉飯": "./audio/dish1.mp3"
+    }
+  ],
+  "hot_store": [
+    {
+      "爌肉飯": "./audio/dish2.mp3"
+    }
+  ]
+}
